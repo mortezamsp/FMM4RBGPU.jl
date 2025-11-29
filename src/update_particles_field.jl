@@ -1,38 +1,9 @@
-#
-
-#module FMM4RBGPUComplete
-
-#using CUDA
-#using StaticArrays
-#using Dates
-
-# Include your existing structures
-export BruteForce, FMM, FMMGPU
+export BruteForce
+export FMM, FMMGPU
 export update_particles_field!
-export Particles
 
 import Base.@kwdef
 
-## Particle structure
-#struct Particles{T, SV <: AbstractArray{SVector{3,T},1}}
-#    positions::SV
-#    momenta::SV
-#    efields::SV
-#    bfields::SV
-#    charge::T
-#    mass::T
-#    npar::Int
-#end
-#
-#function Particles(; pos, mom, charge, mass)
-#    T = eltype(pos)
-#    npar = size(pos, 2)
-#    efields = zeros(SVector{3,T}, npar)
-#    bfields = zeros(SVector{3,T}, npar)
-#    return Particles(pos, mom, efields, bfields, charge, mass, npar)
-#end
-
-# Algorithm structures
 struct BruteForce end
 
 @kwdef struct FMM{T}
@@ -66,98 +37,6 @@ struct TimingResults_CPU
     Update_time::Float64
 end
 
-# Placeholder for cluster tree and other necessary types
-struct ClusterTree
-    clusters::Any
-    parindices::Any
-end
-
-struct MacroParticles
-    # Placeholder implementation
-end
-
-struct InteractionLists
-    m2l_lists::Any
-    m2l_lists_ptrs::Any
-    p2p_lists::Any
-    p2p_lists_ptrs::Any
-    nm2lgroup::Int
-    np2pgroup::Int
-end
-
-struct InteractionListsGPU
-    m2l_lists::Any
-    m2l_lists_ptrs::Any
-    p2p_lists::Any
-    p2p_lists_ptrs::Any
-    nm2lgroup::Int
-    np2pgroup::Int
-end
-
-# Placeholder functions for cluster operations
-function ClusterTree(particles; N0, stretch)
-    # Return a dummy ClusterTree for now
-    return ClusterTree(nothing, nothing)
-end
-
-function MacroParticles(clusters, n)
-    return MacroParticles()
-end
-
-function InteractionLists(clusters; stretch, eta)
-    return InteractionLists([], [], [], [], 0, 0)
-end
-
-function InteractionListsGPU(clusters; stretch, eta)
-    return InteractionListsGPU([], [], [], [], 0, 0)
-end
-
-function upwardpass!(mp, ct; max_level)
-    # Placeholder
-end
-
-function interact!(mp, ct, itlists; p_avg)
-    # Placeholder
-end
-
-function downwardpass!(mp, ct; max_level)
-    # Placeholder
-end
-
-# GPU kernel placeholders (these would call actual CUDA kernels)
-function gpu_P2M!(args...)
-    # Placeholder
-end
-
-function gpu_M2M!(args...)
-    # Placeholder
-end
-
-function gpu_M2L!(args...)
-    # Placeholder
-end
-
-function gpu_P2P!(args...)
-    # Placeholder
-end
-
-function gpu_L2L!(args...)
-    # Placeholder
-end
-
-function gpu_L2P!(args...)
-    # Placeholder
-end
-
-# Utility functions
-function maxlevel(N, N0)
-    return Int(ceil(log2(N / N0)))
-end
-
-function ncluster(N, N0)
-    return 2 * N ÷ N0
-end
-
 
 # Existing BruteForce method
 function update_particles_field!(particles::Particles{T}, alg::BruteForce; lambda) where {T}
@@ -182,9 +61,7 @@ end
 
 # FMM CPU method
 function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) where {T}
-    
-	println("begin CPU function...")
-	(;n, N0, eta) = alg
+    (;n, N0, eta) = alg
    
     println("begin CPU function...")
 
