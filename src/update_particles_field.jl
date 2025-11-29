@@ -76,10 +76,10 @@ function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) wher
 		Update_time::Float64
 	end
 	
-	return TimingResults_CPU(collection_time, M2L_time, P2P_time, Update_time)
+	return TimingResults_CPU(collection_time, PartialTimingResults.M2L_time, PartialTimingResults.P2P_time, Update_time)
 end
 
-function update_particles_field!(particles::Particles{T}, alg::FMMGPU; lambda) where {T}
+function update_particles_field!(particles::Particles{T}, alg::FMMGPU{T}; lambda) where {T}
 	
 	struct TimingResults
 		collection_time::Float64
