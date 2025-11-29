@@ -5,9 +5,9 @@ using Dates
 using DataFrames
 using CSV
 
-# Let's first check what's available
-println("Available methods for update_particles_field!:")
-println(methods(update_particles_field!))
+## Let's first check what's available
+#println("Available methods for update_particles_field!:")
+#println(methods(update_particles_field!))
 
 # Define TimingResults structs based on what the package actually returns
 struct TimingResults
@@ -65,7 +65,7 @@ experiment_num = 1
 
 # Test function to see what works
 function test_single_run()
-    N = 1000  # Small test
+    N = 32000  # Small test
     positions = rand(3, N)
     momenta = zeros(3, N)
     beam = Particles(; pos=positions, mom=momenta, charge=-1.0, mass=1.0)
