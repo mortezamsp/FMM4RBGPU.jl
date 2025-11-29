@@ -17,7 +17,7 @@ struct TimingResults
     P2P_time::Float64
     Update_time::Float64
 	min_n::Int
-	mean_n::Int
+	mean_n::Float64
 	max_n::Int
 end
 
@@ -52,7 +52,7 @@ function main()
 		max_level = Int64[],
 		num_clus = Int64[],
 		min_nei = Int64[],
-		mean_nei = Int64[],
+		mean_nei = Float64[],
 		max_nei = Int64[],
         gpu_time = Float64[],
         cpu_time = Float64[],

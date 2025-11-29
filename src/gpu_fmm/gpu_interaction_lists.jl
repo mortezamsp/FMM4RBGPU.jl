@@ -11,7 +11,7 @@ struct InteractionListsGPU{I}
     p2p_lists_ptrs::Vector{I}
     m2l_lists_ptrs::Vector{I}
 	min_n::Int
-	avg_n::Int
+	avg_n::Float64
 	max_n::Int
 end
 
@@ -40,8 +40,6 @@ function InteractionListsGPU(clusters::Clusters{I,T}; stretch=stretch, eta=eta) 
     m2l_lists_ptrs = ilistptrs(m2l_lists, nm2l)
     np2pgroup = length(p2p_lists_ptrs) - 1
     nm2lgroup = length(m2l_lists_ptrs) - 1
-	println("$min(np2p)")
-	println("$mean(np2p)")
 	min_n=min(np2p)
 	mean_n=mean(np2p)
 	max_n=max(np2p)
