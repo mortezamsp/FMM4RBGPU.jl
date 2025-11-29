@@ -1,10 +1,10 @@
-# complete_package.jl - A complete implementation including the missing methods
+#
 
-module FMM4RBGPUComplete
+#module FMM4RBGPUComplete
 
-using CUDA
-using StaticArrays
-using Dates
+#using CUDA
+#using StaticArrays
+#using Dates
 
 # Include your existing structures
 export BruteForce, FMM, FMMGPU
