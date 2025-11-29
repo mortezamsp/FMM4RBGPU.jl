@@ -1,4 +1,5 @@
 export InteractionListsGPU
+using Statistics
 
 struct InteractionListsGPU{I}
     np2p::I
