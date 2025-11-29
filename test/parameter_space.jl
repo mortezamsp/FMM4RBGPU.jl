@@ -106,7 +106,7 @@ function main()
 				println("  GPU returned nothing")
 				gpu_success = false
 			else
-				println("  GPU execution successful: $gpu_timing_results")
+				println("  GPU execution successful")#: $gpu_timing_results")
 			end
 		catch e
 			println("  GPU execution failed: ", e)
