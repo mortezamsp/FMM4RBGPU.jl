@@ -11,6 +11,12 @@ struct InteractionListsGPU{I}
     m2l_lists_ptrs::Vector{I}
 end
 
+struct neighbors_cnt
+	min_n::Int
+	avg_n::Int
+	max_n::Int
+end
+
 function ilistptrs(lists::Vector{Tuple{I,I}}, nelem::I) where {I}
     lists_ptrs = [1]
     val = lists[1][1]
@@ -36,5 +42,6 @@ function InteractionListsGPU(clusters::Clusters{I,T}; stretch=stretch, eta=eta) 
     m2l_lists_ptrs = ilistptrs(m2l_lists, nm2l)
     np2pgroup = length(p2p_lists_ptrs) - 1
     nm2lgroup = length(m2l_lists_ptrs) - 1
-    return InteractionListsGPU(np2p, nm2l, np2pgroup, nm2lgroup, p2p_lists, m2l_lists, p2p_lists_ptrs, m2l_lists_ptrs)
+	neighbors_cnt=(min(np2p),mean(np2p),max(np2p))
+    return InteractionListsGPU(np2p, nm2l, np2pgroup, nm2lgroup, p2p_lists, m2l_lists, p2p_lists_ptrs, m2l_lists_ptrs, neighbors_cnt)
 end

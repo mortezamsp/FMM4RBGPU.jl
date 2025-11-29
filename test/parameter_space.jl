@@ -51,7 +51,7 @@ function main()
         eta = Float64[],
 		max_level = Int64[],
 		num_clus = Int64[],
-		min_nei = Int[64],
+		min_nei = Int64[],
 		mean_nei = Int64[],
 		max_nei = Int64[],
         gpu_time = Float64[],
