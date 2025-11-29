@@ -158,10 +158,6 @@ function ncluster(N, N0)
     return 2 * N ÷ N0
 end
 
-function leafindexrange(N, N0)
-    return 1:(N ÷ N0)
-end
-
 function nodeindexrangeat(level)
     return (2^level):(2^(level+1)-1)
 end
