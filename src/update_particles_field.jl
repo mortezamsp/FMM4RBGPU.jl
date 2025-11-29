@@ -28,6 +28,9 @@ struct TimingResults
     P2P_computation_time::Float64
     P2P_time::Float64
     Update_time::Float64
+	min_n::Int
+	mean_n::Int
+	max_n::Int
 end
 
 struct TimingResults_CPU
@@ -35,6 +38,8 @@ struct TimingResults_CPU
     M2L_time::Float64
     P2P_time::Float64
     Update_time::Float64
+	max_level::Int
+	num_clus::Int
 end
 
 
@@ -63,7 +68,7 @@ end
 function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) where {T}
     (;n, N0, eta) = alg
    
-    println("begin CPU function...")
+    #println("begin CPU function...")
 
     # Measure collection time
     q = particles.charge
@@ -74,7 +79,8 @@ function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) wher
     max_level = maxlevel(N, N0)
     println("Max level = $max_level")
     ct = ClusterTree(particles; N0=N0, stretch=stretch)
-    println("ClusterTree created: $(length(ct.clusters.parlohis)) clusters")
+	num_clus = length(ct.clusters.parlohis)
+    println("ClusterTree created: $num_clus clusters")
     mp = MacroParticles(ct.clusters, n)
     println("MacroParticles created")
 	
@@ -100,7 +106,7 @@ function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) wher
     end_time = Dates.now()
     Update_time = Float64(Dates.value(end_time - start_time)) 
 
-    return TimingResults_CPU(collection_time, PartialTimingResults.M2L_time, PartialTimingResults.P2P_time, Update_time)
+    return TimingResults_CPU(collection_time, PartialTimingResults.M2L_time, PartialTimingResults.P2P_time, Update_time, max_level, num_clus)
 end
 
 # FMM GPU method
@@ -152,6 +158,7 @@ function update_particles_field!(particles::Particles{T}, alg::FMMGPU; lambda) w
     itlists_gpu = InteractionListsGPU(ct.clusters; stretch=stretch, eta=eta)
 	end_time = Dates.now()
     collection_time = Float64(Dates.value(end_time - start_time))
+	neis = itlists_gpu.neighbors_cnt
 	
     # M2L transfer time
     start_time = Dates.now()
@@ -202,7 +209,7 @@ function update_particles_field!(particles::Particles{T}, alg::FMMGPU; lambda) w
     end_time = Dates.now()
     Update_time = Float64(Dates.value(end_time - start_time))
 
-    return TimingResults(collection_time, M2L_transfer_time, M2L_computation_time, M2L_time, P2P_transfer_time, P2P_computation_time, P2P_time, Update_time)
+    return TimingResults(collection_time, M2L_transfer_time, M2L_computation_time, M2L_time, P2P_transfer_time, P2P_computation_time, P2P_time, Update_time, neis.min_n, neis.mean_n, neis.max_n)
 end
 
 #end # module

@@ -6,90 +6,28 @@ using DataFrames
 using CSV
 
 # Define TimingResults structs based on what the package actually returns
+
 struct TimingResults
-	collection_time::Float64
-	M2L_transfer_time::Float64
-	M2L_computation_time::Float64
-	M2L_time::Float64
-	P2P_transfer_time::Float64
-	P2P_computation_time::Float64
-	P2P_time::Float64
-	Update_time::Float64
+    collection_time::Float64
+    M2L_transfer_time::Float64
+    M2L_computation_time::Float64
+    M2L_time::Float64
+    P2P_transfer_time::Float64
+    P2P_computation_time::Float64
+    P2P_time::Float64
+    Update_time::Float64
+	min_n::Int
+	mean_n::Int
+	max_n::Int
 end
 
 struct TimingResults_CPU
-	collection_time::Float64
-	M2L_time::Float64
-	P2P_time::Float64
-	Update_time::Float64
-end
-
-# Before your main loop, test what the functions actually return
-function test_function_outputs()
-    N = 100000  # Small test
-    positions = rand(3, N)
-    momenta = zeros(3, N)
-    beam = Particles(; pos=positions, mom=momenta, charge=-1.0, mass=1.0)
-    
-    println("Testing FMM function...")
-    result_cpu = update_particles_field!(beam, FMM(eta=0.5, N0=64, n=3); lambda=1.0)
-    println("FMM returns: ", typeof(result_cpu))
-    println("FMM value: ", result_cpu)
-    
-    println("Testing FMMGPU function...")
-    result_gpu = update_particles_field!(beam, FMMGPU(eta=0.5, N0=64, n=3); lambda=1.0)
-    println("FMMGPU returns: ", typeof(result_gpu))
-    println("FMMGPU value: ", result_gpu)
-end
-
-# Uncomment to test:
-test_function_outputs()
-
-# In your main loop, extract timing data safely:
-function extract_timing_data(gpu_timing_results, cpu_timing_results)
-	println("$gpu_timing_results")
-	println("$cpu_timing_results")
-    # GPU timing extraction
-    gpu_collection_time = 0.0
-    gpu_M2L_transfer_time = 0.0
-    gpu_M2L_computation_time = 0.0
-    gpu_M2L_time = 0.0
-    gpu_P2P_transfer_time = 0.0
-    gpu_P2P_computation_time = 0.0
-    gpu_P2P_time = 0.0
-    gpu_Update_time = 0.0
-    
-    if gpu_timing_results !== nothing
-        if isa(gpu_timing_results, TimingResults)
-            gpu_collection_time = gpu_timing_results.collection_time
-            gpu_M2L_transfer_time = gpu_timing_results.M2L_transfer_time
-            gpu_M2L_computation_time = gpu_timing_results.M2L_computation_time
-            gpu_M2L_time = gpu_timing_results.M2L_time
-            gpu_P2P_transfer_time = gpu_timing_results.P2P_transfer_time
-            gpu_P2P_computation_time = gpu_timing_results.P2P_computation_time
-            gpu_P2P_time = gpu_timing_results.P2P_time
-            gpu_Update_time = gpu_timing_results.Update_time
-        end
-    end
-    
-    # CPU timing extraction
-    cpu_collection_time = 0.0
-    cpu_M2L_time = 0.0
-    cpu_P2P_time = 0.0
-    cpu_Update_time = 0.0
-    
-    if cpu_timing_results !== nothing
-        if isa(cpu_timing_results, TimingResults_CPU)
-            cpu_collection_time = cpu_timing_results.collection_time
-            cpu_M2L_time = cpu_timing_results.M2L_time
-            cpu_P2P_time = cpu_timing_results.P2P_time
-            cpu_Update_time = cpu_timing_results.Update_time
-        end
-    end
-    
-    return (gpu_collection_time, gpu_M2L_transfer_time, gpu_M2L_computation_time, gpu_M2L_time,
-            gpu_P2P_transfer_time, gpu_P2P_computation_time, gpu_P2P_time, gpu_Update_time,
-            cpu_collection_time, cpu_M2L_time, cpu_P2P_time, cpu_Update_time)
+    collection_time::Float64
+    M2L_time::Float64
+    P2P_time::Float64
+    Update_time::Float64
+	max_level::Int
+	num_clus::Int
 end
 
 function main()
@@ -111,6 +49,11 @@ function main()
         n = Int64[],
         N0 = Int64[],
         eta = Float64[],
+		max_level = Int64[],
+		num_clus = Int64[],
+		min_nei = Int[64],
+		mean_nei = Int64[],
+		max_nei = Int64[],
         gpu_time = Float64[],
         cpu_time = Float64[],
         speedup = Float64[],
@@ -216,33 +159,34 @@ function main()
             for eta in eta_values
                 total_gpu_time, cpu_time, speedup, gpu_timing_results, cpu_timing_results, gpu_success = safe_run_experiment(experiment_num, N, n, eta)
                 
-				(gpu_collection_time, gpu_M2L_transfer_time, gpu_M2L_computation_time, gpu_M2L_time,
-						 gpu_P2P_transfer_time, gpu_P2P_computation_time, gpu_P2P_time, gpu_Update_time,
-						 cpu_collection_time, cpu_M2L_time, cpu_P2P_time, cpu_Update_time) = extract_timing_data(gpu_timing_results, cpu_timing_results)
-
 				new_row = (
 					experiment_num = experiment_num,
 					N = N,
 					n = n,
 					N0 = N0,
 					eta = eta,
+					max_level = cpu_timing_results.max_level,
+					num_clus = cpu_timing_results.num_clus,
+					min_nei = gpu_timing_results.min_nei,
+					mean_nei = gpu_timing_results.mean_nei,
+					max_nei = gpu_timing_results.max_nei,
 					gpu_time = total_gpu_time,
 					cpu_time = cpu_time,
 					speedup = speedup,
 					# GPU timing details
-					gpu_collection_time = gpu_collection_time,
-					gpu_M2L_transfer_time = gpu_M2L_transfer_time,
-					gpu_M2L_computation_time = gpu_M2L_computation_time,
-					gpu_M2L_time = gpu_M2L_time,
-					gpu_P2P_transfer_time = gpu_P2P_transfer_time,
-					gpu_P2P_computation_time = gpu_P2P_computation_time,
-					gpu_P2P_time = gpu_P2P_time,
-					gpu_Update_time = gpu_Update_time,
+					gpu_collection_time = gpu_timing_results.collection_time,
+					gpu_M2L_transfer_time = gpu_timing_results.M2L_transfer_time,
+					gpu_M2L_computation_time = gpu_timing_results.M2L_computation_time,
+					gpu_M2L_time = gpu_timing_results.M2L_time,
+					gpu_P2P_transfer_time = gpu_timing_results.P2P_transfer_time,
+					gpu_P2P_computation_time = gpu_timing_results.P2P_computation_time,
+					gpu_P2P_time = gpu_timing_results.P2P_time,
+					gpu_Update_time = gpu_timing_results.Update_time,
 					# CPU timing details
-					cpu_collection_time = cpu_collection_time,
-					cpu_M2L_time = cpu_M2L_time,
-					cpu_P2P_time = cpu_P2P_time,
-					cpu_Update_time = cpu_Update_time,
+					cpu_collection_time = cpu_timing_results.collection_time,
+					cpu_M2L_time = cpu_timing_results.M2L_time,
+					cpu_P2P_time = cpu_timing_results.P2P_time,
+					cpu_Update_time = cpu_timing_results.Update_time,
 					total_gpu_time = total_gpu_time
 				)
                                 
