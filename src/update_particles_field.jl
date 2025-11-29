@@ -37,6 +37,14 @@ function Particles(; pos, mom, charge, mass)
     return Particles(positions, momenta, efields, bfields, charge, mass, npar)
 end
 
+function Particles(; pos, mom, charge, mass)
+    T = eltype(pos)
+    npar = size(pos, 2)
+    efields = zeros(SVector{3,T}, npar)
+    bfields = zeros(SVector{3,T}, npar)
+    return Particles(pos, mom, efields, bfields, charge, mass, npar)
+end
+
 # Algorithm structures
 struct BruteForce end
 
