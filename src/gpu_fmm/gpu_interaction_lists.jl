@@ -11,7 +11,7 @@ struct InteractionListsGPU{I}
     p2p_lists_ptrs::Vector{I}
     m2l_lists_ptrs::Vector{I}
 	min_n::Int
-	avg_n::Float64
+	mean_n::Float64
 	max_n::Int
 end
 
