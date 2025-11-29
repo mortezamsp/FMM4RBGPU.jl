@@ -158,7 +158,6 @@ function update_particles_field!(particles::Particles{T}, alg::FMMGPU; lambda) w
     itlists_gpu = InteractionListsGPU(ct.clusters; stretch=stretch, eta=eta)
 	end_time = Dates.now()
     collection_time = Float64(Dates.value(end_time - start_time))
-	neis = itlists_gpu.neighbors_cnt
 	
     # M2L transfer time
     start_time = Dates.now()
@@ -209,7 +208,7 @@ function update_particles_field!(particles::Particles{T}, alg::FMMGPU; lambda) w
     end_time = Dates.now()
     Update_time = Float64(Dates.value(end_time - start_time))
 
-    return TimingResults(collection_time, M2L_transfer_time, M2L_computation_time, M2L_time, P2P_transfer_time, P2P_computation_time, P2P_time, Update_time, neis.min_n, neis.mean_n, neis.max_n)
+    return TimingResults(collection_time, M2L_transfer_time, M2L_computation_time, M2L_time, P2P_transfer_time, P2P_computation_time, P2P_time, Update_time, itlists_gpu.min_n, itlists_gpu.mean_n, itlists_gpu.max_n)
 end
 
 #end # module

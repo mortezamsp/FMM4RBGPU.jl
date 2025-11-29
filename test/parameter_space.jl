@@ -82,7 +82,7 @@ function main()
 		
 		# Create position and momentum distribution of N particles
 		positions = rand(3, N)
-		println(positions)
+		#println(positions)
 		momenta = zeros(3, N)
 		
 		# Create particle beam
