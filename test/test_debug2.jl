@@ -1,29 +1,30 @@
-# Simple test to check if basic FMM components work
-function test_fmm_components()
-    N = 100000
-    positions = rand(3, N)
-    momenta = zeros(3, N)
-    beam = Particles(; pos=positions, mom=momenta, charge=-1.0, mass=1.0)
-    
-    println("=== Testing FMM Components ===")
-    
-    # Test ClusterTree
-    println("1. Testing ClusterTree...")
-    ct = ClusterTree(beam; N0=10, stretch=SVector(1.0,1.0,1.0))
-    println("   ClusterTree created: parindices = $(length(ct.parindices))")
-    println("   Clusters: $(length(ct.clusters.parlohis))")
-    
-    # Test if we can create MacroParticles
-    println("2. Testing MacroParticles...")
-    mp = MacroParticles(ct.clusters, 4)
-    println("   MacroParticles created")
-    
-    println("3. Testing InteractionLists...")
-    itlists = InteractionLists(ct.clusters; stretch=SVector(1.0,1.0,1.0), eta=0.5)
-    println("   InteractionLists created: $(itlists.nm2l) M2L, $(itlists.np2p) P2P")
-    
-    println("=== Component Test Complete ===")
+using Revise
+using FMM4RBGPU_timing
+using CUDA
+using Dates  
+
+# Small test
+const N = 1000
+positions = rand(3, N)
+momenta = zeros(3, N)
+beam = Particles(; pos=positions, mom=momenta, charge=-1.0, mass=1.0)
+
+const n = 4 
+const N0 = 125  
+const eta = 0.5
+
+println("=== DEBUGGING METHOD DISPATCH ===")
+println("beam type: ", typeof(beam))
+println("FMM type: ", typeof(FMM(eta=eta, N0=N0, n=n)))
+
+# Check which method will be called
+meths = methods(update_particles_field!, (typeof(beam), typeof(FMM(eta=eta, N0=N0, n=n))))
+println("Matching methods: ", length(meths))
+for meth in meths
+    println("  - ", meth)
 end
 
-# Run the test
-test_fmm_components()
+# Try calling with explicit types
+println("Calling function...")
+result = update_particles_field!(beam, FMM(eta=eta, N0=N0, n=n); lambda=1.0)
+println("Function completed")

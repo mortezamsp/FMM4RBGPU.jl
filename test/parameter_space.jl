@@ -47,6 +47,8 @@ test_function_outputs()
 
 # In your main loop, extract timing data safely:
 function extract_timing_data(gpu_timing_results, cpu_timing_results)
+	println("$gpu_timing_results")
+	println("$cpu_timing_results")
     # GPU timing extraction
     gpu_collection_time = 0.0
     gpu_M2L_transfer_time = 0.0
@@ -137,6 +139,7 @@ function main()
 		
 		# Create position and momentum distribution of N particles
 		positions = rand(3, N)
+		println(positions)
 		momenta = zeros(3, N)
 		
 		# Create particle beam

@@ -185,7 +185,11 @@ end
 
 # FMM CPU method
 function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) where {T}
-    (;n, N0, eta) = alg
+    
+	println("begin CPU function...")
+	(;n, N0, eta) = alg
+   
+    println("begin CPU function...")
 
     # Measure collection time
     q = particles.charge
@@ -194,6 +198,7 @@ function update_particles_field!(particles::Particles{T}, alg::FMM; lambda) wher
     g_avg = sqrt(1.0 + dot(p_avg, p_avg))
     stretch = SVector(1.0,1.0,g_avg)
     max_level = maxlevel(N, N0)
+    println("Max level = $max_level")
     ct = ClusterTree(particles; N0=N0, stretch=stretch)
     println("ClusterTree created: $(length(ct.clusters.parlohis)) clusters")
     mp = MacroParticles(ct.clusters, n)

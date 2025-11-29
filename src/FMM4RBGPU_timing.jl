@@ -1,4 +1,3 @@
-__precompile__(false)  # Add this line
 module FMM4RBGPU_timing
 
 using LinearAlgebra
