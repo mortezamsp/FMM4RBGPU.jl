@@ -8,24 +8,24 @@ using CSV
 # Define TimingResults structs based on what the package actually returns
 
 struct TimingResults
-    collection_time::Float64
-    M2L_transfer_time::Float64
-    M2L_computation_time::Float64
-    M2L_time::Float64
-    P2P_transfer_time::Float64
-    P2P_computation_time::Float64
-    P2P_time::Float64
-    Update_time::Float64
+    collection_time::Int
+    M2L_transfer_time::Int
+    M2L_computation_time::Int
+    M2L_time::Int
+    P2P_transfer_time::Int
+    P2P_computation_time::Int
+    P2P_time::Int
+    Update_time::Int
 	min_n::Int
 	mean_n::Float64
 	max_n::Int
 end
 
 struct TimingResults_CPU
-    collection_time::Float64
-    M2L_time::Float64
-    P2P_time::Float64
-    Update_time::Float64
+    collection_time::Int
+    M2L_time::Int
+    P2P_time::Int
+    Update_time::Int
 	max_level::Int
 	num_clus::Int
 end
@@ -45,34 +45,34 @@ function main()
 
     # Initialize DataFrame
     df = DataFrame(
-        experiment_num = Int64[],
-        N = Int64[],
-        n = Int64[],
-        N0 = Int64[],
+        experiment_num = Int[],
+        N = Int[],
+        n = Int[],
+        N0 = Int[],
         eta = Float64[],
-		max_level = Int64[],
-		num_clus = Int64[],
-		min_nei = Int64[],
+		max_level = Int[],
+		num_clus = Int[],
+		min_nei = Int[],
 		mean_nei = Float64[],
-		max_nei = Int64[],
-        gpu_time = Float64[],
-        cpu_time = Float64[],
+		max_nei = Int[],
+        gpu_time = Int[],
+        cpu_time = Int[],
         speedup = Float64[],
         # GPU timing details
-        gpu_collection_time = Float64[],
-        gpu_M2L_transfer_time = Float64[],
-        gpu_M2L_computation_time = Float64[],
-        gpu_M2L_time = Float64[],
-        gpu_P2P_transfer_time = Float64[],
-        gpu_P2P_computation_time = Float64[],
-        gpu_P2P_time = Float64[],
-        gpu_Update_time = Float64[],
+        gpu_collection_time = Int[],
+        gpu_M2L_transfer_time = Int[],
+        gpu_M2L_computation_time = Int[],
+        gpu_M2L_time = Int[],
+        gpu_P2P_transfer_time = Int[],
+        gpu_P2P_computation_time = Int[],
+        gpu_P2P_time = Int[],
+        gpu_Update_time = Int[],
         # CPU timing details
-        cpu_collection_time = Float64[],
-        cpu_M2L_time = Float64[],
-        cpu_P2P_time = Float64[],
-        cpu_Update_time = Float64[],
-        total_gpu_time = Float64[]
+        cpu_collection_time = Int[],
+        cpu_M2L_time = Int[],
+        cpu_P2P_time = Int[],
+        cpu_Update_time = Int[],
+        total_gpu_time = Int[]
     )
 
     experiment_num = 1
@@ -99,7 +99,7 @@ function main()
 			start_time = Dates.now()
 			gpu_timing_results = update_particles_field!(beam, FMMGPU(eta=eta, N0=(n+1)^3, n=n); lambda=1.0)
 			end_time = Dates.now()
-			total_gpu_time = Float64(Dates.value(end_time - start_time)) 
+			total_gpu_time = end_time - start_time
 			gpu_success = true
 			println("$total_gpu_time");
 
@@ -133,7 +133,7 @@ function main()
 			start_time = Dates.now()
 			#cpu_timing_results = update_particles_field!(beam_cpu, FMM(eta=eta, N0=(n+1)^3, n=n); lambda=1.0)
 			end_time = Dates.now()
-			cpu_time = Float64(Dates.value(end_time - start_time)) 
+			cpu_time = end_time - start_time
 			cpu_success = true
 			println("$cpu_time")
 			

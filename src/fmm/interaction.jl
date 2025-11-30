@@ -3,8 +3,8 @@ export M2L!, P2P!, interact!
 
 	
 struct PartialTimingResults
-	M2L_time::Float64
-	P2P_time::Float64
+	M2L_time::Int
+	P2P_time::Int
 end
 
 function M2L!(mp::MacroParticles{I,T}, ct::ClusterTree{I,T}, m2l_lists::Vector{Tuple{I,I}}, nm2l::I; p_avg::SVector{3,T}) where {I,T}
@@ -86,12 +86,12 @@ function interact!(mp::MacroParticles{I,T}, ct::ClusterTree{I,T}, itlists::Inter
 	start_time = Dates.now()
     M2L!(mp, ct, itlists.m2l_lists, itlists.nm2l; p_avg=p_avg)
     end_time = Dates.now()
-    M2L_time = Float64(Dates.value(end_time - start_time)) 
+    M2L_time = end_time - start_time
 	
 	start_time = Dates.now()
 	P2P!(ct.particles, ct.parindices, ct.clusters, itlists.p2p_lists, itlists.np2p)
 	end_time = Dates.now()
-    P2P_time = Float64(Dates.value(end_time - start_time)) 
+    P2P_time = end_time - start_time
 
 	return PartialTimingResults(M2L_time, P2P_time)
 end
